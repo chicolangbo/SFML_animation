@@ -38,3 +38,4 @@ enum class SceneId
 	Count,
 };
 
+#include "AnimationClip.h"

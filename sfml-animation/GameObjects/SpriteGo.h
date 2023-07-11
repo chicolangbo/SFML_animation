@@ -21,7 +21,7 @@ public:
 	virtual void Release() override;
 	virtual void Reset() override;
 
-	virtual void UpdateEvent(float dt) override;
+	virtual void Update(float dt) override;
 	virtual void Draw(sf::RenderWindow& window) override;
 
 

@@ -25,9 +25,9 @@ void Framework::Release()
     DATATABLE_MGR.ReleaseAll();
 }
 
-void Framework::UpdateEvent(float dt)
+void Framework::Update(float dt)
 {
-    SCENE_MGR.UpdateEvent(dt);
+    SCENE_MGR.Update(dt);
 }
 
 void Framework::Draw()
@@ -59,12 +59,12 @@ void Framework::Run()
             case sf::Event::GainedFocus:
                 break;
             }
-            INPUT_MGR.UpdateEvent(event);
+            INPUT_MGR.Update(event);
         }
 
         if (window.isOpen())
         {
-            UpdateEvent(dt);
+            Update(dt);
 
             window.clear();
             Draw();

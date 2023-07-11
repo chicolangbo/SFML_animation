@@ -36,7 +36,7 @@ protected:
 
 public:
 	void Update(float dt);
-	void UpdateEvent(const sf::Event& ev);
+	void Update(const sf::Event& ev);
 
 	// Keyboard
 	bool GetKeyDown(sf::Keyboard::Key key);

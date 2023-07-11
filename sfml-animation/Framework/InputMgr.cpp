@@ -48,7 +48,7 @@ void InputMgr::Update(float dt)
 	}
 }
 
-void InputMgr::UpdateEvent(const sf::Event& ev)
+void InputMgr::Update(const sf::Event& ev)
 {
 	switch (ev.type)
 	{

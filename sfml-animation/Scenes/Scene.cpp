@@ -117,7 +117,7 @@ void Scene::Update(float dt)
 	{
 		if (go->GetActive())
 		{
-			go->UpdateEvent(dt);
+			go->Update(dt);
 		}
 	}
 

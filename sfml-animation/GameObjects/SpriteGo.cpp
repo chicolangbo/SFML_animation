@@ -59,7 +59,7 @@ void SpriteGo::Reset()
 	SetOrigin(origin);
 }
 
-void SpriteGo::UpdateEvent(float dt)
+void SpriteGo::Update(float dt)
 {
 }
 

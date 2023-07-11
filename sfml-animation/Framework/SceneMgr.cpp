@@ -43,7 +43,7 @@ void SceneMgr::Release()
 	currentScene = nullptr;
 }
 
-void SceneMgr::UpdateEvent(float dt)
+void SceneMgr::Update(float dt)
 {
 	currentScene->Update(dt);
 }

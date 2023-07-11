@@ -20,6 +20,6 @@ public:
 	virtual void Init() override;
 	virtual void Reset() override;
 
-	virtual void UpdateEvent(float dt) override;
+	virtual void Update(float dt) override;
 };
 

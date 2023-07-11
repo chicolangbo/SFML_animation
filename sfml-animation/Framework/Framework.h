@@ -21,7 +21,7 @@ public:
 	virtual void Init(int width, int height, const std::string& title);
 	virtual void Release();
 
-	virtual void UpdateEvent(float dt);
+	virtual void Update(float dt);
 	virtual void Draw();
 
 	virtual void Run();

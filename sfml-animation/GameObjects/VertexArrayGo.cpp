@@ -75,7 +75,7 @@ void VertexArrayGo::Reset()
 	texture = RESOURCE_MGR.GetTexture(textureId);
 }
 
-void VertexArrayGo::UpdateEvent(float dt)
+void VertexArrayGo::Update(float dt)
 {
 }
 

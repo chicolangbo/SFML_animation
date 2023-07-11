@@ -22,7 +22,7 @@ void SpriteEffect::Reset()
 	sprite.setColor({ 255, 255, 255, 255 });
 }
 
-void SpriteEffect::UpdateEvent(float dt)
+void SpriteEffect::Update(float dt)
 {
 	timer += dt;
 	//UINT8 a = Utils::Lerp(255, 0, (timer / duration));

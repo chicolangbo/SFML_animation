@@ -36,7 +36,7 @@ public:
 
 	virtual void Reset() = 0;	// √ ±‚»≠
 
-	virtual void UpdateEvent(float dt) = 0;
+	virtual void Update(float dt) = 0;
 	virtual void Draw(sf::RenderWindow& window) = 0;
 };
 
