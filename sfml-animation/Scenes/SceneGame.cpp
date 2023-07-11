@@ -6,6 +6,7 @@
 #include "GameObject.h"
 #include "Player.h"
 #include "Framework.h"
+#include "RectGo.h"
 
 SceneGame::SceneGame() : Scene(SceneId::Game)
 {
@@ -16,13 +17,8 @@ void SceneGame::Init()
 {
 	Release();
 
-	//auto size = FRAMEWORK.GetWindowSize();
-	//auto centerPos = size / 2.f;
-	//worldView.setSize(size);
-	//worldView.setCenter(centerPos);
-
-	Player* player = (Player*)AddGo(new Player());
-
+	Player* player = (Player*)AddGo(new Player("player"));
+	RectGo* floor = (RectGo*)AddGo(new RectGo("floor"));
 
 	for (auto go : gameObjects)
 	{
@@ -42,8 +38,11 @@ void SceneGame::Release()
 void SceneGame::Enter()
 {
 	auto size = FRAMEWORK.GetWindowSize();
+	sf::Vector2f centerPos = size * 0.5f;
 	worldView.setSize(size);
-	worldView.setCenter(0,0);
+	worldView.setCenter(centerPos);
+	uiView.setSize(size);
+	uiView.setCenter(centerPos);
 
 	Scene::Enter();
 }

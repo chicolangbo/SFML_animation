@@ -63,6 +63,12 @@ void Player::Init()
 
 	animation.SetTarget(&sprite);
 	SetOrigin(Origins::BC);
+
+	// ¹Ù´Ú
+	floor.setFillColor(sf::Color::Blue);
+	floor.setSize({ FRAMEWORK.GetWindowSize().x, 100.f });
+	Utils::SetOrigin(floor, Origins::BC);
+	floor.setPosition(FRAMEWORK.GetWindowSize().x * 0.5f, FRAMEWORK.GetWindowSize().y);
 }
 
 void Player::Reset()
@@ -70,7 +76,7 @@ void Player::Reset()
 	animation.Play("Idle");
 
 	SetOrigin(origin);
-	SetPosition(0, 0);
+	SetPosition(FRAMEWORK.GetWindowSize().x * 0.5f, 620.f);
 }
 
 void Player::Update(float dt)
@@ -101,6 +107,68 @@ void Player::Update(float dt)
 		animation.PlayQueue("Jump");
 	}
 
+	// USING CODE
+	if (bottomCollide)
+	{
+		direction = { 0.f, 0.f };
+		animation.PlayQueue("Idle");
+	}
+
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Left))
+	{
+		animation.Play("Move");
+	}
+	if (INPUT_MGR.GetKey(sf::Keyboard::Left))
+	{
+		moving = true;
+		sprite.setScale(-1.f, 1.f);
+		direction = { -1.f, 0.f };
+		animation.PlayQueue("Move");
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
+		{
+			animation.Play("Jump");
+			bottomCollide = false;
+			velocity = { 0.f,-1000.f };
+		}
+	}
+	if (INPUT_MGR.GetKeyUp(sf::Keyboard::Left))
+	{
+		animation.Play("Idle");
+	}
+
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Right))
+	{
+		animation.Play("Move");
+	}
+	if (INPUT_MGR.GetKey(sf::Keyboard::Right))
+	{
+		moving = true;
+		sprite.setScale(1.f, 1.f);
+		direction = { 1.f, 0.f };
+		animation.PlayQueue("Move");
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
+		{
+			animation.Play("Jump");
+			bottomCollide = false;
+			velocity = { 0.f,-1000.f };
+		}
+	}
+	if (INPUT_MGR.GetKeyUp(sf::Keyboard::Right))
+	{
+		animation.Play("Idle");
+	}
+
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
+	{
+		animation.Play("Jump");
+		bottomCollide = false;
+		direction = { 0.f,0.f };
+		velocity = { 0.f,-1000.f };
+	}
+
+	MovePlayer(dt);
+	CheckSideCollide();
+
 	SpriteGo::Update(dt);
 	animation.Update(dt);
 }
@@ -108,4 +176,53 @@ void Player::Update(float dt)
 void Player::Draw(sf::RenderWindow& window)
 {
 	SpriteGo::Draw(window);
+	window.draw(floor);
+}
+
+void Player::SetVelocity(sf::Vector2f v)
+{
+	velocity = v;
+}
+
+void Player::MovePlayer(float dt)
+{
+	// ÁÂ¿ì ÀÌµ¿
+	sf::Vector2f tempPosition = GetPosition();
+	tempPosition.x += direction.x * speed * dt;
+
+	//»óÇÏ ÀÌµ¿
+	if (velocity == sf::Vector2f{ 0.f,0.f })
+	{
+		velocity = { 0.f,0.f };
+	}
+	else
+	{
+		velocity += gravity * dt;
+	}
+
+	SetPosition(tempPosition + velocity * dt);
+}
+
+void Player::CheckSideCollide()
+{
+	sf::Vector2f windowSize = FRAMEWORK.GetWindowSize();
+	sf::Vector2f centerPos = windowSize * 0.5f;
+	sf::FloatRect playerBound = sprite.getGlobalBounds(); // ÇÃ·¹ÀÌ¾î °´Ã¼ ¹Ù¿îµå
+	sf::FloatRect floorBound = floor.getGlobalBounds(); // ¹Ù´Ú °´Ã¼ ¹Ù¿îµå
+
+	if (playerBound.intersects(floorBound)) // ¹Ù´Ú Ãæµ¹
+	{
+		bottomCollide = true;
+		SetPosition(GetPosition().x, floorBound.top);
+	}
+
+	if (playerBound.left <= 0.f) // ÁÂ Ãæµ¹
+	{
+		SetPosition(playerBound.width * 0.5f, GetPosition().y);
+	}
+
+	if (playerBound.left + playerBound.width >= windowSize.x) // ¿ì Ãæµ¹
+	{
+		SetPosition(windowSize.x - playerBound.width * 0.5f, GetPosition().y);
+	}
 }
