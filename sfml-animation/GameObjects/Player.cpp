@@ -5,224 +5,278 @@
 
 void Player::Init()
 {
-	std::string textureId = "graphics/sprite_sheet.png";
+	std::string textureId = "graphics/RubySheet.png";
 
 	// Idle
 	{
 		AnimationClip clip;
-		clip.id = "Idle";
+		clip.id = "IdleF";
 		clip.fps = 20;
 		clip.loopType = AnimationLoopTypes::Loop;
 		
-		sf::IntRect coord(0, 0, 120, 120);
-		for (int i = 0; i < 8; ++i)
-		{
-			clip.frames.push_back({textureId, coord});
-			coord.left += coord.width;
-		}
+		sf::IntRect coord(256, 768, 256, 256);
+		clip.frames.push_back({ textureId, coord });
+		animation.AddClip(clip);
+	}
+
+	{
+		AnimationClip clip;
+		clip.id = "IdleLR";
+		clip.fps = 20;
+		clip.loopType = AnimationLoopTypes::Loop;
+
+		sf::IntRect coord(0, 768, 256, 256);
+		clip.frames.push_back({ textureId, coord });
+		animation.AddClip(clip);
+	}
+
+	{
+		AnimationClip clip;
+		clip.id = "IdleB";
+		clip.fps = 20;
+		clip.loopType = AnimationLoopTypes::Loop;
+
+		sf::IntRect coord(512, 768, 256, 256);
+		clip.frames.push_back({ textureId, coord });
 		animation.AddClip(clip);
 	}
 
 	// Move
 	{
 		AnimationClip clip;
-		clip.id = "Move";
+		clip.id = "MoveLR";
 		clip.fps = 10;
 		clip.loopType = AnimationLoopTypes::Loop;
 		
-		sf::IntRect coord(0, 120, 120, 120);
-		for (int i = 0; i < 8; ++i)
+		sf::IntRect coord(0, 0, 256, 256);
+		for (int i = 0; i < 4; ++i)
 		{
 			clip.frames.push_back({textureId, coord});
 			coord.left += coord.width;
 		}
-		clip.frames.push_back({ textureId,sf::IntRect(0, 240, 120, 120) });
 		animation.AddClip(clip);
 	}
 
-	// Jump
 	{
 		AnimationClip clip;
-		clip.id = "Jump";
+		clip.id = "MoveB";
 		clip.fps = 10;
-		clip.loopType = AnimationLoopTypes::Single;
+		clip.loopType = AnimationLoopTypes::Loop;
 		
-		sf::IntRect coord(0, 360, 120, 120);
-		for (int i = 0; i < 7; ++i)
+		sf::IntRect coord(0, 256, 256, 256);
+		for (int i = 0; i < 4; ++i)
 		{
 			clip.frames.push_back({textureId, coord});
 			coord.left += coord.width;
 		}
+		animation.AddClip(clip);
+	}
 
-		clip.frames[6].action = []() {
-			std::cout << "On Complete Jump Clip" << std::endl;
-		};
-
+	{
+		AnimationClip clip;
+		clip.id = "MoveF";
+		clip.fps = 10;
+		clip.loopType = AnimationLoopTypes::Loop;
+		
+		sf::IntRect coord(0, 512, 256, 256);
+		for (int i = 0; i < 4; ++i)
+		{
+			clip.frames.push_back({textureId, coord});
+			coord.left += coord.width;
+		}
 		animation.AddClip(clip);
 	}
 
 	animation.SetTarget(&sprite);
 	SetOrigin(Origins::BC);
 
-	// 바닥
-	floor.setFillColor(sf::Color::Blue);
-	floor.setSize({ FRAMEWORK.GetWindowSize().x, 100.f });
-	Utils::SetOrigin(floor, Origins::BC);
-	floor.setPosition(FRAMEWORK.GetWindowSize().x * 0.5f, FRAMEWORK.GetWindowSize().y);
+	//// 바닥
+	//floor.setFillColor(sf::Color::Blue);
+	//floor.setSize({ FRAMEWORK.GetWindowSize().x, 100.f });
+	//Utils::SetOrigin(floor, Origins::BC);
+	//floor.setPosition(FRAMEWORK.GetWindowSize().x * 0.5f, FRAMEWORK.GetWindowSize().y);
 }
 
 void Player::Reset()
 {
-	animation.Play("Idle");
-
+	animation.Play("IdleF");
 	SetOrigin(origin);
-	SetPosition(FRAMEWORK.GetWindowSize().x * 0.5f, 620.f);
+	SetPosition({ FRAMEWORK.GetWindowSize().x * 0.5f, 620.f });
+	SetFlipX(false);
 }
 
 void Player::Update(float dt)
 {
 	// TEST CODE
-	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num1))
 	{
-		animation.Play("Idle");
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num1))
+		{
+			animation.Play("IdleF");
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num2))
+		{
+			animation.Play("IdleLR");
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num3))
+		{
+			animation.Play("IdleB");
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num4))
+		{
+			animation.Play("MoveLR");
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num5))
+		{
+			animation.Play("MoveB");
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num6))
+		{
+			animation.Play("MoveF");
+		}
 	}
-	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num2))
-	{
-		animation.Play("Move");
-	}
-	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num3))
-	{
-		animation.Play("Jump");
-	}
-	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num4))
-	{
-		animation.PlayQueue("Idle");
-	}
-	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num5))
-	{
-		animation.PlayQueue("Move");
-	}
-	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num6))
-	{
-		animation.PlayQueue("Jump");
-	}
+
+	animation.Update(dt);
+	direction.x = INPUT_MGR.GetAxis(Axis::Horizontal);
+	direction.y = INPUT_MGR.GetAxis(Axis::Vertical);
 
 	// USING CODE
-	if (bottomCollide)
 	{
-		direction = { 0.f, 0.f };
-		animation.PlayQueue("Idle");
-	}
-
-	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Left))
-	{
-		animation.Play("Move");
-	}
-	if (INPUT_MGR.GetKey(sf::Keyboard::Left))
-	{
-		moving = true;
-		sprite.setScale(-1.f, 1.f);
-		direction = { -1.f, 0.f };
-		animation.PlayQueue("Move");
-		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
+		// 플립
+		if (direction.x != 0.f)
 		{
-			animation.Play("Jump");
-			bottomCollide = false;
-			velocity = { 0.f,-1000.f };
+			bool flip = direction.x > 0.f;
+			if (GetFlipX() != flip)
+			{
+				SetFlipX(flip);
+			}
+		}
+
+		// 점프
+		//if (isCollide && INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
+		//{
+		//	velocity.y += JumpForce;
+		//	animation.Play("Jump");
+		//	isCollide = false;
+		//}
+
+		// 이동
+		position += direction * speed * dt;
+
+		// 바닥 충돌 처리
+		if (position.y >= FRAMEWORK.GetWindowSize().y)
+		{
+			isCollide = true;
+			position.y = FRAMEWORK.GetWindowSize().y;
+		}
+
+		// 위 충돌 처리
+		if (position.y <= 256.f)
+		{
+			isCollide = true;
+			position.y = 256.f;
+		}
+
+		// 좌 충돌 처리
+		if (position.x <= 128.f)
+		{
+			isCollide = true;
+			position.x = 128.f;
+		}
+
+		// 우 충돌 처리
+		if (position.x >= FRAMEWORK.GetWindowSize().x - 128.f)
+		{
+			isCollide = true;
+			position.x = FRAMEWORK.GetWindowSize().x - 128.f;
+		}
+
+		SetPosition(position);
+
+		// 애니메이션
+		//if (INPUT_MGR.GetKey(sf::Keyboard::A) || INPUT_MGR.GetKey(sf::Keyboard::D))
+		//{
+		//	animation.Play("MoveLR");
+		//	isCollide = false;
+		//}
+
+		//if (INPUT_MGR.GetKey(sf::Keyboard::W))
+		//{
+		//	animation.Play("MoveB");
+		//	isCollide = false;
+		//}
+
+		//if (INPUT_MGR.GetKey(sf::Keyboard::S))
+		//{
+		//	animation.Play("MoveF");
+		//	isCollide = false;
+		//}
+
+		//else
+		//{
+		//	animation.Play("IdleF");
+		//}
+
+
+		// 애니메이션 기존 코드
+		{
+			if (animation.GetCurrentClipId() == "IdleF" || 
+				animation.GetCurrentClipId() == "IdleLR" || 
+				animation.GetCurrentClipId() == "IdleB")
+			{
+				if (direction.x != 0.f)
+				{
+					animation.Play("MoveLR");
+				}
+				if (direction.y < 0)
+				{
+					animation.Play("MoveB");
+				}
+				if (direction.y > 0)
+				{
+					animation.Play("MoveF");
+				}
+			}
+			else if (animation.GetCurrentClipId() == "MoveLR")
+			{
+				if (direction.x == 0.f && direction.y == 0.f)
+				{
+					animation.Play("IdleLR");
+				}
+			}
+			else if (animation.GetCurrentClipId() == "MoveB")
+			{
+				if (direction.x == 0.f && direction.y == 0.f)
+				{
+					animation.Play("IdleB");
+				}
+			}
+			else if (animation.GetCurrentClipId() == "MoveF")
+			{
+				if (direction.x == 0.f && direction.y == 0.f)
+				{
+					animation.Play("IdleF");
+				}
+			}
 		}
 	}
-	if (INPUT_MGR.GetKeyUp(sf::Keyboard::Left))
-	{
-		animation.Play("Idle");
-	}
-
-	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Right))
-	{
-		animation.Play("Move");
-	}
-	if (INPUT_MGR.GetKey(sf::Keyboard::Right))
-	{
-		moving = true;
-		sprite.setScale(1.f, 1.f);
-		direction = { 1.f, 0.f };
-		animation.PlayQueue("Move");
-		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
-		{
-			animation.Play("Jump");
-			bottomCollide = false;
-			velocity = { 0.f,-1000.f };
-		}
-	}
-	if (INPUT_MGR.GetKeyUp(sf::Keyboard::Right))
-	{
-		animation.Play("Idle");
-	}
-
-	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
-	{
-		animation.Play("Jump");
-		bottomCollide = false;
-		direction = { 0.f,0.f };
-		velocity = { 0.f,-1000.f };
-	}
-
-	MovePlayer(dt);
-	CheckSideCollide();
-
-	SpriteGo::Update(dt);
-	animation.Update(dt);
 }
 
 void Player::Draw(sf::RenderWindow& window)
 {
 	SpriteGo::Draw(window);
-	window.draw(floor);
+	//window.draw(floor);
 }
 
-void Player::SetVelocity(sf::Vector2f v)
+bool Player::GetFlipX() const
 {
-	velocity = v;
+	return flipX;
 }
 
-void Player::MovePlayer(float dt)
+void Player::SetFlipX(bool flip)
 {
-	// 좌우 이동
-	sf::Vector2f tempPosition = GetPosition();
-	tempPosition.x += direction.x * speed * dt;
+	flipX = flip;
 
-	//상하 이동
-	if (velocity == sf::Vector2f{ 0.f,0.f })
-	{
-		velocity = { 0.f,0.f };
-	}
-	else
-	{
-		velocity += gravity * dt;
-	}
-
-	SetPosition(tempPosition + velocity * dt);
-}
-
-void Player::CheckSideCollide()
-{
-	sf::Vector2f windowSize = FRAMEWORK.GetWindowSize();
-	sf::Vector2f centerPos = windowSize * 0.5f;
-	sf::FloatRect playerBound = sprite.getGlobalBounds(); // 플레이어 객체 바운드
-	sf::FloatRect floorBound = floor.getGlobalBounds(); // 바닥 객체 바운드
-
-	if (playerBound.intersects(floorBound)) // 바닥 충돌
-	{
-		bottomCollide = true;
-		SetPosition(GetPosition().x, floorBound.top);
-	}
-
-	if (playerBound.left <= 0.f) // 좌 충돌
-	{
-		SetPosition(playerBound.width * 0.5f, GetPosition().y);
-	}
-
-	if (playerBound.left + playerBound.width >= windowSize.x) // 우 충돌
-	{
-		SetPosition(windowSize.x - playerBound.width * 0.5f, GetPosition().y);
-	}
+	sf::Vector2f scale = sprite.getScale();
+	scale.x = !flip ? abs(scale.x) : -abs(scale.x);
+	sprite.setScale(scale);
 }
