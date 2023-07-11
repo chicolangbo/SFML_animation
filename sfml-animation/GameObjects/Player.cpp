@@ -82,92 +82,95 @@ void Player::Reset()
 void Player::Update(float dt)
 {
 	// TEST CODE
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num1))
 	{
-		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num1))
-		{
-			animation.Play("Idle");
-		}
-		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num2))
-		{
-			animation.Play("Move");
-		}
-		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num3))
-		{
-			animation.Play("Jump");
-		}
-		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num4))
-		{
-			animation.PlayQueue("Idle");
-		}
-		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num5))
-		{
-			animation.PlayQueue("Move");
-		}
-		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num6))
-		{
-			animation.PlayQueue("Jump");
-		}
+		animation.Play("Idle");
+	}
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num2))
+	{
+		animation.Play("Move");
+	}
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num3))
+	{
+		animation.Play("Jump");
+	}
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num4))
+	{
+		animation.PlayQueue("Idle");
+	}
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num5))
+	{
+		animation.PlayQueue("Move");
+	}
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num6))
+	{
+		animation.PlayQueue("Jump");
 	}
 
 	// USING CODE
-	animation.Update(dt);
-	float h = INPUT_MGR.GetAxis(Axis::Horizontal);
-
-	// 플립
-	if (h != 0.f)
+	if (bottomCollide)
 	{
-		bool flip = h < 0.f;
-		if (GetFlipX() != flip)
-		{
-			SetFlipX(flip);
-		}
+		direction = { 0.f, 0.f };
+		animation.PlayQueue("Idle");
 	}
 
-	// 점프
-	if (isGround && INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Left))
 	{
-		velocity.y += JumpForce;
+		animation.Play("Move");
+	}
+	if (INPUT_MGR.GetKey(sf::Keyboard::Left))
+	{
+		moving = true;
+		sprite.setScale(-1.f, 1.f);
+		direction = { -1.f, 0.f };
+		animation.PlayQueue("Move");
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
+		{
+			animation.Play("Jump");
+			bottomCollide = false;
+			velocity = { 0.f,-1000.f };
+		}
+	}
+	if (INPUT_MGR.GetKeyUp(sf::Keyboard::Left))
+	{
+		animation.Play("Idle");
+	}
+
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Right))
+	{
+		animation.Play("Move");
+	}
+	if (INPUT_MGR.GetKey(sf::Keyboard::Right))
+	{
+		moving = true;
+		sprite.setScale(1.f, 1.f);
+		direction = { 1.f, 0.f };
+		animation.PlayQueue("Move");
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
+		{
+			animation.Play("Jump");
+			bottomCollide = false;
+			velocity = { 0.f,-1000.f };
+		}
+	}
+	if (INPUT_MGR.GetKeyUp(sf::Keyboard::Right))
+	{
+		animation.Play("Idle");
+	}
+
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
+	{
 		animation.Play("Jump");
-		isGround = false;
+		bottomCollide = false;
+		direction = { 0.f,0.f };
+		velocity = { 0.f,-1000.f };
 	}
 
-	// 이동
-	velocity.x = h * speed;
-	velocity.y += gravity * dt;
-	position += velocity * dt;
+	MovePlayer(dt);
+	CheckSideCollide();
 
-	// 바닥 충돌 처리
-	if (position.y > 0.f)
-	{
-		isGround = true;
-		position.y = 0.f;
-		velocity.y = 0.f;
-	}
-
-	SetPosition(position);
-
-	// 에니메이션
-	if (animation.GetCurrentClipId() == "Idle")
-	{
-		if (isGround && h != 0.f)
-		{
-			animation.Play("Move");
-		}
-	}
-	else if (animation.GetCurrentClipId() == "Move")
-	{
-		if (isGround && h == 0.f)
-		{
-			animation.Play("Idle");
-		}
-	}
-	else if (animation.GetCurrentClipId() == "Jump")
-	{
-		if (isGround)
-		{
-			animation.Play((h == 0.f) ? "Idle" : "Move");
-		}
-	}
+	SpriteGo::Update(dt);
+	animation.Update(dt);
 }
 
 void Player::Draw(sf::RenderWindow& window)
@@ -176,16 +179,50 @@ void Player::Draw(sf::RenderWindow& window)
 	window.draw(floor);
 }
 
-bool Player::GetFlipX() const
+void Player::SetVelocity(sf::Vector2f v)
 {
-	return flipX;
+	velocity = v;
 }
 
-void Player::SetFlipX(bool flip)
+void Player::MovePlayer(float dt)
 {
-	flipX = flip;
+	// 좌우 이동
+	sf::Vector2f tempPosition = GetPosition();
+	tempPosition.x += direction.x * speed * dt;
 
-	sf::Vector2f scale = sprite.getScale();
-	scale.x = !flip ? abs(scale.x) : -abs(scale.x);
-	sprite.setScale(scale);
+	//상하 이동
+	if (velocity == sf::Vector2f{ 0.f,0.f })
+	{
+		velocity = { 0.f,0.f };
+	}
+	else
+	{
+		velocity += gravity * dt;
+	}
+
+	SetPosition(tempPosition + velocity * dt);
+}
+
+void Player::CheckSideCollide()
+{
+	sf::Vector2f windowSize = FRAMEWORK.GetWindowSize();
+	sf::Vector2f centerPos = windowSize * 0.5f;
+	sf::FloatRect playerBound = sprite.getGlobalBounds(); // 플레이어 객체 바운드
+	sf::FloatRect floorBound = floor.getGlobalBounds(); // 바닥 객체 바운드
+
+	if (playerBound.intersects(floorBound)) // 바닥 충돌
+	{
+		bottomCollide = true;
+		SetPosition(GetPosition().x, floorBound.top);
+	}
+
+	if (playerBound.left <= 0.f) // 좌 충돌
+	{
+		SetPosition(playerBound.width * 0.5f, GetPosition().y);
+	}
+
+	if (playerBound.left + playerBound.width >= windowSize.x) // 우 충돌
+	{
+		SetPosition(windowSize.x - playerBound.width * 0.5f, GetPosition().y);
+	}
 }

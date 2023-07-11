@@ -8,15 +8,17 @@ class Player :
 {
 protected:
     AnimationController animation;
-    sf::Vector2f direction = { 0.f, 0.f };
-    float speed = 300.f;
-    sf::Vector2f velocity = { 0.f, 0.f };
-    sf::Vector2f gravity = {0.f, 2000.f};
+
+    sf::Vector2f velocity;
+    float accel = 500.f;
+    float speed = 500.f;
+    float JumpForce = -250.f;
+    float gravity = 500.f;
+
+    bool flipX = false;
+    bool isGround = true;
 
     sf::RectangleShape floor;
-
-    bool bottomCollide = true;
-    bool moving = false;
 
 public:
     Player(const std::string& textureId = "", const std::string& n = "") : SpriteGo(textureId, n) {};
@@ -30,5 +32,8 @@ public:
     void SetVelocity(sf::Vector2f v);
     void MovePlayer(float dt);
     void CheckSideCollide();
+
+    bool GetFlipX() const;
+    void SetFlipX(bool flip);
 };
 
