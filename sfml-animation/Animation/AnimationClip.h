@@ -16,7 +16,10 @@ struct AnimationFrame
 struct AnimationClip
 {
 	std::string id;
-	std::vector<AnimationFrame> frames;
 	AnimationLoopTypes loopType;
 	int fps;
+
+	std::vector<AnimationFrame> frames;
+
+	bool LoadFromFile(const std::string path);
 };

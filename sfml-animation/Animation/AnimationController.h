@@ -25,7 +25,12 @@ public:
 	bool IsPlaying() { return isPlaying; }
 	void SetSpeed(float s) { speed = s; }
 	float GetSpeed() const { return speed; }
-	std::string GetCurrentClipId() { return currentClip->id; }
+	std::string GetCurrentClipId() const {
+		if (currentClip == nullptr)
+		{
+			return "";
+		}
+		return currentClip->id; }
 
 	void Update(float dt);
 	void Play(const std::string& clipId, bool clearQueue = true);

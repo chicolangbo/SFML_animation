@@ -62,6 +62,17 @@ void ResourceMgr::Load(ResourceTypes t, const std::string path)
 		}
 	}
 	break;
+	case ResourceTypes::AnimationClip:
+	{
+		auto it = mapSoundBuffer.find(path);
+		if (mapSoundBuffer.end() == it)
+		{
+			auto clip = new AnimationClip();
+			clip->LoadFromFile(path);
+			mapAnimationClip.insert({ path, clip });
+		}
+	}
+	break;
 	}
 
 
@@ -109,6 +120,16 @@ void ResourceMgr::Unload(ResourceTypes t, const std::string id)
 		}
 	}
 	break;
+	case ResourceTypes::AnimationClip:
+	{
+		auto it = mapAnimationClip.find(id);
+		if (it != mapAnimationClip.end())
+		{
+			delete it->second;
+			mapAnimationClip.erase(it);
+		}
+	}
+	break;
 	}
 }
 
@@ -144,6 +165,16 @@ sf::SoundBuffer* ResourceMgr::GetSoundBuffer(const std::string& id)
 {
 	auto it = mapSoundBuffer.find(id);
 	if (it != mapSoundBuffer.end())
+	{
+		return it->second;
+	}
+	return nullptr;
+}
+
+AnimationClip* ResourceMgr::GetAnimationClip(const std::string& id)
+{
+	auto it = mapAnimationClip.find(id);
+	if (it != mapAnimationClip.end())
 	{
 		return it->second;
 	}

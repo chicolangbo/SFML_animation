@@ -1,100 +1,27 @@
-#include "stdafx.h"
+癤�#include "stdafx.h"
 #include "Player.h"
 #include "InputMgr.h"
 #include "Framework.h"
+#include "ResourceMgr.h"
 
 void Player::Init()
 {
-	std::string textureId = "graphics/RubySheet.png";
+	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/IdleF.csv");
+	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/IdleLR.csv");
+	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/IdleB.csv");
+	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/MoveF.csv");
+	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/MoveLR.csv");
+	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/MoveB.csv");
 
-	// Idle
-	{
-		AnimationClip clip;
-		clip.id = "IdleF";
-		clip.fps = 20;
-		clip.loopType = AnimationLoopTypes::Loop;
-		
-		sf::IntRect coord(256, 768, 256, 256);
-		clip.frames.push_back({ textureId, coord });
-		animation.AddClip(clip);
-	}
-
-	{
-		AnimationClip clip;
-		clip.id = "IdleLR";
-		clip.fps = 20;
-		clip.loopType = AnimationLoopTypes::Loop;
-
-		sf::IntRect coord(0, 768, 256, 256);
-		clip.frames.push_back({ textureId, coord });
-		animation.AddClip(clip);
-	}
-
-	{
-		AnimationClip clip;
-		clip.id = "IdleB";
-		clip.fps = 20;
-		clip.loopType = AnimationLoopTypes::Loop;
-
-		sf::IntRect coord(512, 768, 256, 256);
-		clip.frames.push_back({ textureId, coord });
-		animation.AddClip(clip);
-	}
-
-	// Move
-	{
-		AnimationClip clip;
-		clip.id = "MoveLR";
-		clip.fps = 10;
-		clip.loopType = AnimationLoopTypes::Loop;
-		
-		sf::IntRect coord(0, 0, 256, 256);
-		for (int i = 0; i < 4; ++i)
-		{
-			clip.frames.push_back({textureId, coord});
-			coord.left += coord.width;
-		}
-		animation.AddClip(clip);
-	}
-
-	{
-		AnimationClip clip;
-		clip.id = "MoveB";
-		clip.fps = 10;
-		clip.loopType = AnimationLoopTypes::Loop;
-		
-		sf::IntRect coord(0, 256, 256, 256);
-		for (int i = 0; i < 4; ++i)
-		{
-			clip.frames.push_back({textureId, coord});
-			coord.left += coord.width;
-		}
-		animation.AddClip(clip);
-	}
-
-	{
-		AnimationClip clip;
-		clip.id = "MoveF";
-		clip.fps = 10;
-		clip.loopType = AnimationLoopTypes::Loop;
-		
-		sf::IntRect coord(0, 512, 256, 256);
-		for (int i = 0; i < 4; ++i)
-		{
-			clip.frames.push_back({textureId, coord});
-			coord.left += coord.width;
-		}
-		animation.AddClip(clip);
-	}
+	animation.AddClip(*RESOURCE_MGR.GetAnimationClip("animations/IdleF.csv"));
+	animation.AddClip(*RESOURCE_MGR.GetAnimationClip("animations/IdleLR.csv"));
+	animation.AddClip(*RESOURCE_MGR.GetAnimationClip("animations/IdleB.csv"));
+	animation.AddClip(*RESOURCE_MGR.GetAnimationClip("animations/MoveF.csv"));
+	animation.AddClip(*RESOURCE_MGR.GetAnimationClip("animations/MoveLR.csv"));
+	animation.AddClip(*RESOURCE_MGR.GetAnimationClip("animations/MoveB.csv"));
 
 	animation.SetTarget(&sprite);
 	SetOrigin(Origins::BC);
-
-	//// 바닥
-	//floor.setFillColor(sf::Color::Blue);
-	//floor.setSize({ FRAMEWORK.GetWindowSize().x, 100.f });
-	//Utils::SetOrigin(floor, Origins::BC);
-	//floor.setPosition(FRAMEWORK.GetWindowSize().x * 0.5f, FRAMEWORK.GetWindowSize().y);
 }
 
 void Player::Reset()
@@ -141,7 +68,6 @@ void Player::Update(float dt)
 
 	// USING CODE
 	{
-		// 플립
 		if (direction.x != 0.f)
 		{
 			bool flip = direction.x > 0.f;
@@ -151,39 +77,26 @@ void Player::Update(float dt)
 			}
 		}
 
-		// 점프
-		//if (isCollide && INPUT_MGR.GetKeyDown(sf::Keyboard::Space))
-		//{
-		//	velocity.y += JumpForce;
-		//	animation.Play("Jump");
-		//	isCollide = false;
-		//}
-
-		// 이동
 		position += direction * speed * dt;
 
-		// 바닥 충돌 처리
 		if (position.y >= FRAMEWORK.GetWindowSize().y)
 		{
 			isCollide = true;
 			position.y = FRAMEWORK.GetWindowSize().y;
 		}
 
-		// 위 충돌 처리
 		if (position.y <= 256.f)
 		{
 			isCollide = true;
 			position.y = 256.f;
 		}
 
-		// 좌 충돌 처리
 		if (position.x <= 128.f)
 		{
 			isCollide = true;
 			position.x = 128.f;
 		}
 
-		// 우 충돌 처리
 		if (position.x >= FRAMEWORK.GetWindowSize().x - 128.f)
 		{
 			isCollide = true;
@@ -192,35 +105,9 @@ void Player::Update(float dt)
 
 		SetPosition(position);
 
-		// 애니메이션
-		//if (INPUT_MGR.GetKey(sf::Keyboard::A) || INPUT_MGR.GetKey(sf::Keyboard::D))
-		//{
-		//	animation.Play("MoveLR");
-		//	isCollide = false;
-		//}
-
-		//if (INPUT_MGR.GetKey(sf::Keyboard::W))
-		//{
-		//	animation.Play("MoveB");
-		//	isCollide = false;
-		//}
-
-		//if (INPUT_MGR.GetKey(sf::Keyboard::S))
-		//{
-		//	animation.Play("MoveF");
-		//	isCollide = false;
-		//}
-
-		//else
-		//{
-		//	animation.Play("IdleF");
-		//}
-
-
-		// 애니메이션 기존 코드
 		{
-			if (animation.GetCurrentClipId() == "IdleF" || 
-				animation.GetCurrentClipId() == "IdleLR" || 
+			if (animation.GetCurrentClipId() == "IdleF" ||
+				animation.GetCurrentClipId() == "IdleLR" ||
 				animation.GetCurrentClipId() == "IdleB")
 			{
 				if (direction.x != 0.f)
@@ -264,7 +151,6 @@ void Player::Update(float dt)
 void Player::Draw(sf::RenderWindow& window)
 {
 	SpriteGo::Draw(window);
-	//window.draw(floor);
 }
 
 bool Player::GetFlipX() const

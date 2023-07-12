@@ -33,4 +33,3 @@ public:
     void SetFlipX(bool filp);
 
 };
-
