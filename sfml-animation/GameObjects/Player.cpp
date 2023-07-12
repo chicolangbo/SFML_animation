@@ -6,12 +6,12 @@
 
 void Player::Init()
 {
-	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/IdleF.csv");
-	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/IdleLR.csv");
-	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/IdleB.csv");
-	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/MoveF.csv");
-	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/MoveLR.csv");
-	RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/MoveB.csv");
+	//RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/IdleF.csv");
+	//RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/IdleLR.csv");
+	//RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/IdleB.csv");
+	//RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/MoveF.csv");
+	//RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/MoveLR.csv");
+	//RESOURCE_MGR.Load(ResourceTypes::AnimationClip, "animations/MoveB.csv");
 
 	animation.AddClip(*RESOURCE_MGR.GetAnimationClip("animations/IdleF.csv"));
 	animation.AddClip(*RESOURCE_MGR.GetAnimationClip("animations/IdleLR.csv"));

@@ -11,9 +11,7 @@
 
 SceneGame::SceneGame() : Scene(SceneId::Game)
 {
-	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/RubySheet.png"));
-	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/button.png"));
-	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/button2.png"));
+	resourceListPath = "script/SceneGameResourceList.csv";
 }
 
 void SceneGame::Init()

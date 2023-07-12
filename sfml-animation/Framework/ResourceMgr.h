@@ -9,20 +9,24 @@ protected:
 	ResourceMgr() = default;
 	virtual ~ResourceMgr() override;
 	
-	std::map<std::string, sf::Texture*> mapTexture;
-	std::map<std::string, sf::Font*> mapFont;
-	std::map<std::string, sf::SoundBuffer*> mapSoundBuffer;
-	std::map<std::string, AnimationClip*> mapAnimationClip;
+	std::map<std::string, std::tuple<sf::Texture*, bool>> mapTexture;
+	std::map<std::string, std::tuple<sf::Font*, bool>> mapFont;
+	std::map<std::string, std::tuple<sf::SoundBuffer*, bool>> mapSoundBuffer;
+	std::map<std::string, std::tuple<AnimationClip*, bool>> mapAnimationClip;
+
+	// 전역으로 로드/언로드 컨테이너, 씬마다 로드/언로드 컨테이너 구분
+
 
 public:
 
+	void Init();
+
 	void UnLoadAll();
 
-	void Load(ResourceTypes t, const std::string path);
-	void Load(const std::vector<std::tuple<ResourceTypes, std::string>>& array);
+	void LoadFromCSV(const std::string path, bool isDefault = false);
+	void Load(ResourceTypes t, const std::string path, bool isDefault = false);
 
 	void Unload(ResourceTypes t, const std::string path);
-	void Unload(const std::vector<std::tuple<ResourceTypes, std::string>>& array);
 
 
 	sf::Texture* GetTexture(const std::string& id);

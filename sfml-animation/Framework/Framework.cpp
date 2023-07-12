@@ -16,6 +16,7 @@ void Framework::Init(int width, int height, const std::string& title)
 
     DATATABLE_MGR.LoadAll();
     // Resource
+    RESOURCE_MGR.Init();
     SCENE_MGR.Init();
 }
 
