@@ -7,18 +7,37 @@
 #include "Player.h"
 #include "Framework.h"
 #include "RectGo.h"
+#include "UIButton.h"
 
 SceneGame::SceneGame() : Scene(SceneId::Game)
 {
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/RubySheet.png"));
+	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/button.png"));
+	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/button2.png"));
 }
 
 void SceneGame::Init()
 {
 	Release();
-
+	auto size = FRAMEWORK.GetWindowSize();
 	Player* player = (Player*)AddGo(new Player("player"));
-	RectGo* floor = (RectGo*)AddGo(new RectGo("floor"));
+	UIButton* testButton = (UIButton*)AddGo(new UIButton("graphics/button.png"));
+	testButton->SetOrigin(Origins::TR);
+	testButton->sortLayer = 100;
+	testButton->SetPosition(size.x, 0.f);
+	testButton->OnEnter = [testButton]() {
+		std::cout << "Enter" << std::endl;
+		sf::Texture* tex = RESOURCE_MGR.GetTexture("graphics/button2.png");
+		testButton->sprite.setTexture(*tex);
+	};
+	testButton->OnClick = []() {
+		std::cout << "Click" << std::endl;
+	};
+	testButton->OnExit = [testButton]() {
+		std::cout << "Exit" << std::endl;
+		sf::Texture* tex = RESOURCE_MGR.GetTexture(testButton->textureId);
+		testButton->sprite.setTexture(*tex);
+	};
 
 	for (auto go : gameObjects)
 	{
@@ -40,7 +59,7 @@ void SceneGame::Enter()
 	auto size = FRAMEWORK.GetWindowSize();
 	sf::Vector2f centerPos = size * 0.5f;
 	worldView.setSize(size);
-	worldView.setCenter(centerPos);
+	worldView.setCenter(0,0);
 	uiView.setSize(size);
 	uiView.setCenter(centerPos);
 

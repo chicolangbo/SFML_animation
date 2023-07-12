@@ -28,7 +28,7 @@ void Player::Reset()
 {
 	animation.Play("IdleF");
 	SetOrigin(origin);
-	SetPosition({ FRAMEWORK.GetWindowSize().x * 0.5f, 620.f });
+	SetPosition(0,0);
 	SetFlipX(false);
 }
 
@@ -79,29 +79,29 @@ void Player::Update(float dt)
 
 		position += direction * speed * dt;
 
-		if (position.y >= FRAMEWORK.GetWindowSize().y)
-		{
-			isCollide = true;
-			position.y = FRAMEWORK.GetWindowSize().y;
-		}
+		//if (position.y >= FRAMEWORK.GetWindowSize().y)
+		//{
+		//	isCollide = true;
+		//	position.y = FRAMEWORK.GetWindowSize().y;
+		//}
 
-		if (position.y <= 256.f)
-		{
-			isCollide = true;
-			position.y = 256.f;
-		}
+		//if (position.y <= 256.f)
+		//{
+		//	isCollide = true;
+		//	position.y = 256.f;
+		//}
 
-		if (position.x <= 128.f)
-		{
-			isCollide = true;
-			position.x = 128.f;
-		}
+		//if (position.x <= 128.f)
+		//{
+		//	isCollide = true;
+		//	position.x = 128.f;
+		//}
 
-		if (position.x >= FRAMEWORK.GetWindowSize().x - 128.f)
-		{
-			isCollide = true;
-			position.x = FRAMEWORK.GetWindowSize().x - 128.f;
-		}
+		//if (position.x >= FRAMEWORK.GetWindowSize().x - 128.f)
+		//{
+		//	isCollide = true;
+		//	position.x = FRAMEWORK.GetWindowSize().x - 128.f;
+		//}
 
 		SetPosition(position);
 
